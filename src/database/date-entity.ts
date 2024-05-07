@@ -1,6 +1,7 @@
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
 
-export abstract class DateEntity extends BaseEntity { //базовая сущность
+export abstract class DateEntity extends BaseEntity {
+  //базовая сущность
   @CreateDateColumn({
     name: 'created_at',
     type: 'time with time zone',
