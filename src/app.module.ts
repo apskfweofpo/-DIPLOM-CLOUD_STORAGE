@@ -1,44 +1,22 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DatabaseConfig, appConfig, databaseConfig } from './configs';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { join } from 'path';
-import { types } from 'pg';
+import { WinstonModule } from 'nest-winston';
+import { DatabaseModule } from './database/database.module';
+import { winstonConfig } from './config/winston.config';
+import { AppConfigModule } from './config/app-config.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { AuthModule } from './core/auth/auth.module';
+import { ProjectsModule } from './core/projects/projects.module';
 
-// @UseGuards(AccessTokenGuard)
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      load: [databaseConfig, appConfig],
-      isGlobal: true,
-      ignoreEnvFile: process.env.NODE_ENV !== 'local',
-      envFilePath: `.${process.env.NODE_ENV}.env`,
-    }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory(configService: ConfigService) {
-        const dbConfig = configService.get<DatabaseConfig>('database');
-        const options: PostgresConnectionOptions = {
-          ...dbConfig,
-          synchronize: true,
-          migrationsRun: false,
-          entities: [join(__dirname, '**/*.entity.{ts,js}')],
-        };
-        types.setTypeParser(types.builtins.INT8, (value) => {
-          return value === null ? null : BigInt(value).toString();
-        });
-        return options;
-      },
-      inject: [ConfigService],
-    }),
+    AppConfigModule,
+    MulterModule.register(),
+    WinstonModule.forRoot(winstonConfig),
+    DatabaseModule,
+    AuthModule,
+    ProjectsModule,
   ],
-  // providers: [
-  //   {
-  //     provide: APP_GUARD,
-  //     useClass: RolesGuard
-  //   },
-  //   Reflector
-  // ]
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

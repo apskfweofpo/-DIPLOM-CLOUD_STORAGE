@@ -1,35 +1,37 @@
+import { winstonConfig } from './config/winston.config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AppConfig } from './configs';
+import { WINSTON_MODULE_NEST_PROVIDER, WinstonLogger, WinstonModule } from 'nest-winston';
+import { setupSwagger } from './swagger';
 import { ConfigService } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppExceptionFilter } from './common/filters/exception.filter';
-import { ResponseFormatInterceptor } from './common/interceptor/response-format.interceptor';
-import { Logger } from '@nestjs/common';
+import { AppConfig } from './config/interfaces/app-config.interface';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipeOptions } from './config/validation-pipe.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger({ ...winstonConfig }),
+  });
 
-  app.setGlobalPrefix('api-v1');
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('API Documentation')
-    .setVersion('0.0.1')
-    .addSecurity('bearer', {
-      type: 'http',
-      scheme: 'bearer',
-    })
-    .build();
-
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api-v1/docs', app, document, {});
   const configService = app.get(ConfigService);
+  const appConfig: AppConfig = configService.get<AppConfig>('app');
+  const PORT: string | number = appConfig.port;
 
-  app.useGlobalFilters(new AppExceptionFilter());
-  app.useGlobalInterceptors(new ResponseFormatInterceptor());
-  // app.useGlobalPipes(new ValidationPipe());
-  // app.enableCors({ allowedHeaders: '*', exposedHeaders: '*' });
-  const appConfig = configService.get<AppConfig>('app');
-  Logger.debug(`Server start in: ` + appConfig.apiPort);
-  await app.listen(appConfig.apiPort ?? 3000);
+  app.setGlobalPrefix('api');
+  setupSwagger(app);
+
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+
+  app.useGlobalPipes(new ValidationPipe(ValidationPipeOptions));
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.enableCors({ allowedHeaders: '*', exposedHeaders: '*' });
+
+  const logger: WinstonLogger = app.get(WINSTON_MODULE_NEST_PROVIDER);
+  // app.useGlobalFilters(new ValidationExceptionFilter(logger));
+
+  await app.listen(PORT, () => {
+    logger.log(`Server works on ${PORT}`);
+  });
 }
 bootstrap();

@@ -11,6 +11,12 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Imports for DB
+.imports
+
+# Env
+.env
+
 # OS
 .DS_Store
 
@@ -33,5 +39,3 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-.idea

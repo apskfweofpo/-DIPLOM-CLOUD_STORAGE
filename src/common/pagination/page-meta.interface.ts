@@ -1,6 +1,9 @@
-import { PageOptionsDto } from './page-meta-options.dto';
-
 export interface PageMetaParameters {
-  pageOptions: PageOptionsDto;
+  pageOptions: PageOptions;
   total: number;
+}
+
+interface PageOptions {
+  perPage: number;
+  page: number;
 }
