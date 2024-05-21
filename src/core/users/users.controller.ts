@@ -65,7 +65,6 @@ export class UsersController {
   @Get('profile')
   getProfile(@Req() req: Request) {
     const userId = req.user['sub'];
-
     return this.usersService.findOne(+userId);
   }
 

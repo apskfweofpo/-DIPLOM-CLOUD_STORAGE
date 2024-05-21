@@ -8,6 +8,8 @@ import { AppConfig } from './config/interfaces/app-config.interface';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 import { ValidationPipeOptions } from './config/validation-pipe.config';
+import cookieParser from 'cookie-parser';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -20,7 +22,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   setupSwagger(app);
-
+  app.use(cookieParser());
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   app.useGlobalPipes(new ValidationPipe(ValidationPipeOptions));

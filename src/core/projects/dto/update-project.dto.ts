@@ -8,5 +8,5 @@ export class UpdateProjectDto {
 
   @ApiPropertyOptional({ example: 'student', title: 'username', description: 'username' })
   @IsOptional()
-  is_public: string;
+  is_public: boolean;
 }

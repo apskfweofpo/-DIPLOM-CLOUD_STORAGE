@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
@@ -14,7 +14,9 @@ import { Messages } from 'src/common/response_messages/messages';
 import { ApiErrorWrapper } from 'src/common/decorators/swagger-error.decorator';
 import { Exceptions } from 'src/common/exceptions/exceptions';
 import { ExceptionMessages } from 'src/common/exceptions/exception-messages';
-
+import { Response } from 'express';
+import { Cookies } from './decorators/cookies.decorator';
+import * as jwt from 'jsonwebtoken';
 @ApiTags('Authorization')
 @Controller('auth')
 export class AuthController {
@@ -33,8 +35,9 @@ export class AuthController {
   @ApiErrorWrapper(Exceptions[ExceptionMessages.NOT_FOUND])
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   @Post('signup')
-  signup(@Body() createUserDto: SignUpDto) {
-    return this.authService.signUp(createUserDto);
+  async signup(@Body() createUserDto: SignUpDto, @Res({ passthrough: true }) response: Response) {
+    const tokens = await  this.authService.signUp(createUserDto);
+    response.cookie('refresh_token', tokens.refreshToken)
   }
 
   @ApiOperation({
@@ -51,8 +54,10 @@ export class AuthController {
   @ApiErrorWrapper(Exceptions[ExceptionMessages.NOT_FOUND])
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   @Post('signin')
-  signin(@Body() data: AuthDto) {
-    return this.authService.signIn(data);
+  async signin(@Body() data: AuthDto,  @Res({ passthrough: true }) response: Response) {
+    const tokens = await this.authService.signIn(data);
+    response.cookie('refresh_token', tokens.refreshToken)
+    return tokens
   }
 
   @ApiOperation({
@@ -70,8 +75,9 @@ export class AuthController {
   @UseGuards(AccessTokenGuard, RolesGuard)
   @ApiBearerAuth()
   @Get('logout')
-  logout(@Req() req: Request) {
+  logout(@Req() req: Request,  @Res({ passthrough: true }) response: Response) {
     this.authService.logout(req.user['sub']);
+    response.clearCookie('refresh_token')
     return null;
   }
 
@@ -85,11 +91,12 @@ export class AuthController {
     },
     AuthDto,
   )
-  @UseGuards(RefreshTokenGuard)
+  // @UseGuards(RefreshTokenGuard)
   @Get('refresh')
-  refreshTokens(@Req() req: Request) {
-    const userId = req.user['sub'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
+  async refreshTokens(@Req() req: Request, @Cookies('refresh_token') refreshToken: string, @Res({ passthrough: true }) response: Response) {
+    const {sub} = jwt.decode(refreshToken) as { sub: string };
+    const tokens  = await this.authService.refreshTokens(+sub, refreshToken);
+    response.cookie('refresh_token', tokens.refreshToken)
+    return tokens
   }
 }
