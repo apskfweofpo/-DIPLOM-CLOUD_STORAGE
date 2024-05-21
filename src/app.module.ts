@@ -20,8 +20,8 @@ import path from 'path';
     ProjectsModule,
     FilesModule,
     ServeStaticModule.forRoot({
-      rootPath: path.resolve( __dirname, 'static'),
-  }),
+      rootPath: path.resolve(__dirname, 'static'),
+    }),
   ],
   controllers: [],
   providers: [],

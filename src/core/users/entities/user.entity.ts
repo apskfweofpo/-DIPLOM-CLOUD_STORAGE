@@ -18,6 +18,6 @@ export class User extends BaseEntity {
   @Column({ default: ROLES.USER })
   role: ROLES;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   refreshToken: string;
 }

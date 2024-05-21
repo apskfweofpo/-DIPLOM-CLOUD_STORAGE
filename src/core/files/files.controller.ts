@@ -46,11 +46,8 @@ export class FilesController {
   @UseInterceptors(FileInterceptor('file'))
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   @Post('file')
-  async createFile(
-    @Body() dto: CreateFileDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return this.filesService.createFile(dto, file)
+  async createFile(@Body() dto: CreateFileDto, @UploadedFile() file: Express.Multer.File) {
+    return this.filesService.createFile(dto, file);
   }
 
   @ApiOperation({
@@ -60,10 +57,8 @@ export class FilesController {
   @ApiResponse({ status: 201, description: 'Папка успешно создана' })
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   @Post('package')
-  async createPackage(
-    @Body() dto: CreatePackageDto,
-  ) {
-    return this.filesService.createPackage(dto)
+  async createPackage(@Body() dto: CreatePackageDto) {
+    return this.filesService.createPackage(dto);
   }
 
   @ApiOperation({
@@ -81,7 +76,7 @@ export class FilesController {
   })
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   @Delete()
-  remove( @Query() dto: DeleteFilesDto,) {
+  remove(@Query() dto: DeleteFilesDto) {
     return this.filesService.remove(dto.ids);
   }
 }

@@ -32,7 +32,7 @@ export class FilesService {
     const meme_type = uploadedFile.originalname.split('.')[1];
     const size = uploadedFile.size / 1000000;
 
-    let { name, project_id, parent_id } = dto;
+    const { name, project_id, parent_id } = dto;
 
     const file = this.repository.create({
       name,
@@ -48,7 +48,7 @@ export class FilesService {
       file.parentId = parent_id;
     }
 
-    const project = await this.projectRepository.findOne({where: {id: project_id}});
+    const project = await this.projectRepository.findOne({ where: { id: project_id } });
     project.updateSize();
     return this.repository.save(file);
   }
@@ -79,12 +79,14 @@ export class FilesService {
   async remove(raw_ids: string) {
     const ids: number[] = raw_ids.split(',').map((id) => Number(id));
 
-    const project = await this.projectRepository.findOne({where:{
-      files: {
-        id: ids[0]
-      }
-    }})
-    project.updateSize()
+    const project = await this.projectRepository.findOne({
+      where: {
+        files: {
+          id: ids[0],
+        },
+      },
+    });
+    project.updateSize();
 
     return this.repository.delete(ids);
   }

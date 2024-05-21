@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Req, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  Req,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -18,7 +29,6 @@ import { Request } from 'express';
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-
   @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: 'Создать проект',
@@ -33,8 +43,8 @@ export class ProjectsController {
   )
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto, @Req() req: Request ) {
-    return this.projectsService.create({...createProjectDto, user_id: req.user['sub']});
+  create(@Body() createProjectDto: CreateProjectDto, @Req() req: Request) {
+    return this.projectsService.create({ ...createProjectDto, user_id: req.user['sub'] });
   }
 
   @ApiOperation({

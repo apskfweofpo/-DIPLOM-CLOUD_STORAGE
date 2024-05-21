@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString,  } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
 
 export class GetProjectsDto extends PaginationDto {
@@ -17,7 +17,7 @@ export class GetProjectsDto extends PaginationDto {
     enum: ['asc', 'desc'],
   })
   @IsOptional()
-  sort_direction: "ASC" | "DESC";
+  sort_direction: 'ASC' | 'DESC';
 
   @ApiPropertyOptional({
     example: 'students',

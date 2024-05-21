@@ -10,7 +10,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { ValidationPipeOptions } from './config/validation-pipe.config';
 import cookieParser from 'cookie-parser';
 
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger({ ...winstonConfig }),

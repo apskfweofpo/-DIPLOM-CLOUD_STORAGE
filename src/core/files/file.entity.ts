@@ -61,10 +61,10 @@ export class Files extends BaseEntity {
     if (this.children) {
       let size = 0;
       for (const file of this.children) {
-        if(file.file_type == FileType.package){
-          file.updateSize()
+        if (file.file_type == FileType.package) {
+          file.updateSize();
         }
-        size += file.size
+        size += file.size;
       }
       this.size = size;
     }

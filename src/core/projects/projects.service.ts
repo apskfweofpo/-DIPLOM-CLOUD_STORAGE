@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository, SelectQueryBuilder } from 'typeorm';
@@ -24,7 +23,8 @@ export class ProjectsService {
   }
 
   async findAll(dto: GetProjectsDto) {
-    const queryBuilder: SelectQueryBuilder<Project> = this.repository.createQueryBuilder('projects');
+    const queryBuilder: SelectQueryBuilder<Project> =
+      this.repository.createQueryBuilder('projects');
 
     const page = dto.page;
     const perPage = dto.per_page;
@@ -53,14 +53,14 @@ export class ProjectsService {
   }
 
   findOne(id: number) {
-    return this.repository.findOne({where:{id}})
+    return this.repository.findOne({ where: { id } });
   }
 
   update(id: number, updateProjectDto: UpdateProjectDto) {
-    return this.repository.update(id, updateProjectDto)
+    return this.repository.update(id, updateProjectDto);
   }
 
   remove(id: number) {
-    return this.repository.delete(id)
+    return this.repository.delete(id);
   }
 }

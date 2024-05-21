@@ -45,6 +45,6 @@ export class Project extends BaseEntity {
       }
       size += file.size;
     }
-    this.size = size
+    this.size = size;
   }
 }
