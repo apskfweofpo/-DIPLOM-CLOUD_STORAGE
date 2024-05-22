@@ -15,6 +15,7 @@ import path, { join } from 'path';
         const options = {
           ...dbConfig,
           synchronize: true,
+          logging: true,
           entities: [join(rootDir, 'core', '**', '*.entity.{ts,js}')],
         };
         types.setTypeParser(types.builtins.INT8, (value) => {

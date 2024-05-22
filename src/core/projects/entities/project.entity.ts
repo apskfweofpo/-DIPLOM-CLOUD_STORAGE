@@ -18,7 +18,7 @@ export class Project extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ default: 0, nullable: true })
+  @Column({ default: 0, nullable: true, type: 'float8' })
   size: number;
 
   @Column({ default: true })
@@ -36,15 +36,4 @@ export class Project extends BaseEntity {
 
   @OneToMany(() => Files, (file) => file.project)
   files: Files[];
-
-  updateSize(): void {
-    let size = 0;
-    for (const file of this.files) {
-      if (file.children) {
-        file.updateSize();
-      }
-      size += file.size;
-    }
-    this.size = size;
-  }
 }

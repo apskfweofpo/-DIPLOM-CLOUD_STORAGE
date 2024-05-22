@@ -1,7 +1,7 @@
-import { Controller, Get, Body, Param, Delete, Query, Req, Put } from '@nestjs/common';
+import { Controller, Get, Body, Param, Delete, Query, Req, Put, Post, UseInterceptors, UploadedFile, UseGuards, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiResponseWrapper } from 'src/common/decorators/swagger.decorator';
 import { Messages } from 'src/common/response_messages/messages';
 import { UserDto } from './dto/user.dto';
@@ -11,6 +11,8 @@ import { ExceptionMessages } from 'src/common/exceptions/exception-messages';
 import { PageData } from 'src/common/pagination/page-data';
 import { GetUsersDto } from './dto/get-users.dto';
 import { Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -103,12 +105,44 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
-    summary: '[ADMIN]Удалить пользователя',
-    description: 'Этот запрос используется для удаления пользователя',
+    summary: 'Удалить иконку',
+    description: 'Этот запрос используется для удаления иконки',
+  })
+  @ApiResponse({ status: 201, description: 'Иконка успешно удалена' })
+  @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
+  @Delete('icon')
+  async deleteIcon(@Req() req: Request) {
+    console.log('req',req)
+    const userId = +req.user['sub']
+    console.log('userId',userId)
+    return this.usersService.deleteIcon(userId);
+  }
+
+  @ApiOperation({
+    summary: '[ADMIN]Забанить пользователя',
+    description: 'Этот запрос используется для бана пользователя',
   })
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.ban(+id);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({
+    summary: 'Создать иконку',
+    description: 'Этот запрос используется для создания иконки',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 201, description: 'Иконка успешно создана' })
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
+  @Post('icon')
+  async createIcon(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
+    const userId = +req.user['sub']
+    return this.usersService.createIcon(userId, file);
+  }
+
+ 
 }

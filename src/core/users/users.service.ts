@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindOptionsWhere, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -7,12 +7,15 @@ import { GetUsersDto } from './dto/get-users.dto';
 import { PageMeta } from 'src/common/pagination/page-meta';
 import { PageData } from 'src/common/pagination/page-data';
 import * as argon2 from 'argon2';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private repository: Repository<User>,
+    @Inject(FilesService)
+    private filesService: FilesService,
   ) {}
   async findByOption(where: FindOptionsWhere<User>): Promise<User> {
     return this.repository.findOne({ where });
@@ -61,7 +64,17 @@ export class UsersService {
     return this.repository.update(id, updateUserDto);
   }
 
-  remove(id: number) {
-    return this.repository.delete(id);
+  ban(id: number) {
+    return this.repository.update(id, { is_ban: true });
+  }
+
+  async createIcon(userId: number, file: Express.Multer.File) {
+    const icon_path = await this.filesService.writeFile(file);
+    return await this.repository.update(userId, { icon_path });
+  }
+
+  async deleteIcon(userId: number) {
+    console.log('userId',userId)
+    return await this.repository.update(userId, { icon_path: null });
   }
 }

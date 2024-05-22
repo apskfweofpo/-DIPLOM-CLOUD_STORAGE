@@ -38,7 +38,7 @@ export class Files extends BaseEntity {
   @JoinColumn({ name: 'project_id' })
   project: Project;
 
-  @Column({ type: 'bigint', select: false })
+  @Column({ type: 'bigint'})
   project_id: number;
 
   @ManyToOne((type) => Files, (category) => category.children)
@@ -57,16 +57,16 @@ export class Files extends BaseEntity {
   })
   file_type: FileType;
 
-  updateSize() {
-    if (this.children) {
-      let size = 0;
-      for (const file of this.children) {
-        if (file.file_type == FileType.package) {
-          file.updateSize();
-        }
-        size += file.size;
-      }
-      this.size = size;
-    }
-  }
+  // updateSize() {
+  //   if (this.children) {
+  //     let size = 0;
+  //     for (const file of this.children) {
+  //       if (file.file_type == FileType.package) {
+  //         file.updateSize();
+  //       }
+  //       size += file.size;
+  //     }
+  //     this.size = size;
+  //   }
+  // }
 }

@@ -8,7 +8,7 @@ import { Project } from '../projects/entities/project.entity';
 @Module({
   controllers: [FilesController],
   providers: [FilesService],
-  // exports: [ProjectsService],
+  exports: [FilesService],
   imports: [TypeOrmModule.forFeature([Files, Project])],
 })
 export class FilesModule {}

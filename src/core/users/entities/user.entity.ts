@@ -15,6 +15,12 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
+  @Column({default: false})
+  is_ban: boolean;
+
+  @Column({default: null, nullable: true})
+  icon_path: string;
+
   @Column({ default: ROLES.USER })
   role: ROLES;
 
