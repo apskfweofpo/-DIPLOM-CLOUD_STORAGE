@@ -35,8 +35,9 @@ export class AuthController {
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   @Post('signup')
   async signup(@Body() createUserDto: SignUpDto, @Res({ passthrough: true }) response: Response) {
-    const tokens = await this.authService.signUp(createUserDto);
-    response.cookie('refresh_token', tokens.refreshToken);
+    const data = await this.authService.signUp(createUserDto);
+    response.cookie('refresh_token', data.tokens.refreshToken);
+    return data
   }
 
   @ApiOperation({
@@ -54,9 +55,9 @@ export class AuthController {
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   @Post('signin')
   async signin(@Body() data: AuthDto, @Res({ passthrough: true }) response: Response) {
-    const tokens = await this.authService.signIn(data);
-    response.cookie('refresh_token', tokens.refreshToken);
-    return tokens;
+    const qwe = await this.authService.signIn(data);
+    response.cookie('refresh_token', qwe.tokens.refreshToken);
+    return qwe;
   }
 
   @ApiOperation({

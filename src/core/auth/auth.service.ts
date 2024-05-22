@@ -31,7 +31,7 @@ export class AuthService {
     });
     const tokens = await this.getTokens(newUser);
     await this.updateRefreshToken(newUser.id, tokens.refreshToken);
-    return tokens;
+    return {newUser, tokens};
   }
 
   async signIn(data: AuthDto) {
@@ -48,7 +48,7 @@ export class AuthService {
     if (!passwordMatches) throw new BadRequestException('Password is incorrect');
     const tokens = await this.getTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
-    return tokens;
+    return {tokens, user};
   }
 
   async logout(userId: number) {

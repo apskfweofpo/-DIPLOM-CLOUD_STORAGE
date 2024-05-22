@@ -29,9 +29,9 @@ export class FilesService {
 
   async createFile(dto: CreateFileDto, uploadedFile: Express.Multer.File) {
     const path = await this.writeFile(uploadedFile);
-    const names = uploadedFile.originalname.split('.')
+    const names = uploadedFile.originalname.split('.');
 
-    const meme_type =  names[names.length - 1]
+    const meme_type = names[names.length - 1];
     const size = uploadedFile.size / 1000000;
 
     const { name, project_id, parent_id } = dto;
@@ -46,7 +46,13 @@ export class FilesService {
     });
 
     if (parent_id) {
-      file.parent = await this.repository.findOne({ where: { id: parent_id } });
+      const parent = await this.repository.findOne({
+        where: { id: parent_id },
+        relations: { parent: true },
+        select: {project_id: true, id: true, size: true, parent: {id: true}}
+      });
+      await this.updateSize(parent, size);
+      file.parent = parent;
       file.parentId = parent_id;
     }
 
@@ -55,18 +61,24 @@ export class FilesService {
       relations: { files: true },
     });
 
-    let project_size = 0;
-    project.files?.forEach(async (file) => {
-      if (file.children) {
-        project_size += await this.updateSize(file);
-      } else {
-        project_size += file.size;
-      }
-    });
-    console.log('project_size', project_size);
-    project.size = project_size;
-    this.projectRepository.save(project);
-    return this.repository.save(file);
+    this.projectRepository.save({ ...project, size: project.size + size });
+    this.repository.save(file);
+  }
+
+  async updateSize(file: Files, size_change: number) {
+    const { size } = file;
+    console.log('file.id',file.id)
+    await this.repository.update(file.id, { size: size + size_change });
+    console.log('file.id',file.id)
+    if (file.parent) {
+      console.log('file.parent',file.parent)
+      const parent = await this.repository.findOne({
+        where: { id: file.parent.id },
+        relations: { parent: true },
+        select: { project_id: true, id: true, size: true, parent: { id: true } },
+      });
+      await this.updateSize(parent, size_change);
+    }
   }
 
   async update(id: number, dto: UpdateFileDto) {
@@ -75,9 +87,9 @@ export class FilesService {
 
   async writeFile(file: Express.Multer.File) {
     try {
-      const names = file.originalname.split('.')
-      console.log('names',names)
-      const meme_type = names[names.length - 1]
+      const names = file.originalname.split('.');
+      console.log('names', names);
+      const meme_type = names[names.length - 1];
       const fileName = uuidv4() + '.' + meme_type;
       const filePath = path.resolve(__dirname, '..', '..', 'static');
       if (!fs.existsSync(filePath)) {
@@ -97,53 +109,36 @@ export class FilesService {
   async remove(raw_ids: string) {
     const ids: number[] = raw_ids.split(',').map((id) => Number(id));
 
-    const project = await this.projectRepository.findOne({
-      where: {
-        files: {
-          id: ids[0],
+    for (const id of ids) {
+      const project = await this.projectRepository.findOne({
+        where: {
+          files: {
+            id,
+          },
         },
-      },
-      relations: {
-        files: {
-          children: true
+        relations: {
+          files: {
+            parent: true,
+          },
         },
-      },
-    });
+      });
 
-    if (!project) return null;
-    //  await this.repository.delete(ids);
-    let project_size = 0;
+      if (!project) return null;
 
-    if (project.files) {
-      for (const file of project.files) {
-        if (file.children) {
-          project_size += await this.updateSize(file);
-        } else {
-          project_size += file.size;
-        }
-      }
+      // const file = await this.repository.findOne({ where: { id }, relations: {} });
+
+      const file = await this.repository.findOne({
+        where: { id },
+        relations: { parent: true },
+        select: { project_id: true, id: true, size: true, parent: { id: true } },
+      });
+      await this.updateSize(file, -file.size);
+
+      await this.projectRepository.save({ ...project, size: project.size - file.size });
     }
-    // console.log('project_size', project_size);
-    project.size = project_size;
-    console.log('project',project)
-    // await this.projectRepository.save(project);
-    return console.log('project_size', project_size);
 
-  }
+    return null;
 
-  async updateSize(file: Files) {
-    if (file.children) {
-      let size = 0;
-      for (const filik of file.children) {
-        if (filik.children) {
-          this.updateSize(filik)
-        }
-        size += filik.size;
-      }
-      file.size = size;
-      await this.repository.save(file);
-      return size;
-    }
-    return file.size;
+    // return console.log('project_size', project_size);
   }
 }
