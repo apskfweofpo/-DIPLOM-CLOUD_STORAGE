@@ -13,6 +13,7 @@ import { GetUsersDto } from './dto/get-users.dto';
 import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { ChangeRoleDto } from './dto/change-role.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -88,6 +89,9 @@ export class UsersController {
     return this.usersService.update(+userId, updateUserDto);
   }
 
+
+  
+
   @ApiOperation({
     summary: '[ADMIN]Редактировать пользователя',
     description: 'Этот запрос используется для редактирования пользователя',
@@ -103,6 +107,24 @@ export class UsersController {
   @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
+  }
+
+
+  @ApiOperation({
+    summary: '[SUPERADMIN]Изменить роль',
+    description: 'Этот запрос используется для изменения роли пользователя',
+  })
+  @Put('role/:id')
+  @ApiResponseWrapper(
+    {
+      options: { status: 200, description: Messages.SUCCESSFUL_OPERATION },
+      withMeta: true,
+    },
+    UserDto,
+  )
+  @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
+  changeRole(@Param('id') id: string, @Body() changeRoleDto: ChangeRoleDto) {
+    return this.usersService.update(+id, changeRoleDto);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -143,6 +165,4 @@ export class UsersController {
     const userId = +req.user['sub']
     return this.usersService.createIcon(userId, file);
   }
-
- 
 }

@@ -34,10 +34,11 @@ export class FilesService {
     const meme_type = names[names.length - 1];
     const size = uploadedFile.size / 1000000;
 
-    const { name, project_id, parent_id } = dto;
+    const { name, description, project_id, parent_id } = dto;
 
     const file = this.repository.create({
       name,
+      description,
       meme_type,
       path,
       size,
@@ -61,7 +62,7 @@ export class FilesService {
       relations: { files: true },
     });
 
-    this.projectRepository.save({ ...project, size: project.size + size });
+    this.projectRepository.update(project.id, {size: project.size + size })
     this.repository.save(file);
   }
 
@@ -109,6 +110,8 @@ export class FilesService {
   async remove(raw_ids: string) {
     const ids: number[] = raw_ids.split(',').map((id) => Number(id));
 
+    console.log('katysha',ids)
+
     for (const id of ids) {
       const project = await this.projectRepository.findOne({
         where: {
@@ -134,11 +137,12 @@ export class FilesService {
       });
       await this.updateSize(file, -file.size);
 
-      await this.projectRepository.save({ ...project, size: project.size - file.size });
+      await this.repository.delete(file.id)
+
+      await this.projectRepository.update( project.id ,{ size: project.size - file.size });
     }
 
     return null;
 
-    // return console.log('project_size', project_size);
   }
 }

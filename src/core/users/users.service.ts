@@ -54,7 +54,9 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return this.repository.findOne({ where: { id } });
+    return this.repository.findOne({ where: { id } ,relations: {
+      projects: true
+    } });
   }
 
   async update(id: number, updateUserDto: Partial<User>) {

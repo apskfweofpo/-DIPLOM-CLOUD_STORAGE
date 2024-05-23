@@ -5,6 +5,10 @@ export class CreateFileDto {
   @ApiProperty({ example: 'dog', title: 'name', description: 'name' })
   name: string;
 
+  @ApiPropertyOptional({ example: 'bark', title: 'description', description: 'description' })
+  @IsOptional()
+  description: string;
+
   @ApiProperty({ example: '1', title: 'project_id', description: 'project_id' })
   project_id: number;
 

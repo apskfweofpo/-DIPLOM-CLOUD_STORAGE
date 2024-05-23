@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ROLES } from '../constrants/roles.enum';
+import { Project } from 'src/core/projects/entities/project.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -26,4 +27,7 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   refreshToken: string;
+
+  @OneToMany(() => Project, (project) => project.user)
+  projects: Project[];
 }

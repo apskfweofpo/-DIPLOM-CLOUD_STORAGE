@@ -18,8 +18,11 @@ export class Project extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ default: 0, nullable: true, type: 'float8' })
+  @Column('float', { default: 0, nullable: true })
   size: number;
+
+  @Column('float', { default: 1000, nullable: true })
+  max_size: number;
 
   @Column({ default: true })
   is_public: boolean;
@@ -31,7 +34,7 @@ export class Project extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ type: 'bigint', select: false })
+  @Column({ type: 'bigint', select: true })
   user_id: number;
 
   @OneToMany(() => Files, (file) => file.project)

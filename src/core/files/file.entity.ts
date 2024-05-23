@@ -22,6 +22,9 @@ export class Files extends BaseEntity {
   @Column()
   name: string;
 
+  @Column({default: ''})
+  description: string;
+
   @Column({ nullable: true })
   meme_type: string;
 
@@ -41,13 +44,17 @@ export class Files extends BaseEntity {
   @Column({ type: 'bigint'})
   project_id: number;
 
-  @ManyToOne((type) => Files, (category) => category.children)
+  @ManyToOne((type) => Files, (category) => category.children, {
+    onDelete: 'CASCADE',
+  })
   parent: Files;
 
-  @Column({ type: 'bigint', select: false, nullable: true })
+  @Column({ type: 'bigint', select: true, nullable: true })
   parentId: number;
 
-  @OneToMany((type) => Files, (category) => category.parent)
+  @OneToMany((type) => Files, (category) => category.parent, {
+    onDelete: 'CASCADE',
+  })
   children: Files[];
 
   @Column({
@@ -56,17 +63,4 @@ export class Files extends BaseEntity {
     default: FileType.file,
   })
   file_type: FileType;
-
-  // updateSize() {
-  //   if (this.children) {
-  //     let size = 0;
-  //     for (const file of this.children) {
-  //       if (file.file_type == FileType.package) {
-  //         file.updateSize();
-  //       }
-  //       size += file.size;
-  //     }
-  //     this.size = size;
-  //   }
-  // }
 }
