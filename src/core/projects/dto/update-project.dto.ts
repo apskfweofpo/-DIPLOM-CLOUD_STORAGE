@@ -6,6 +6,10 @@ export class UpdateProjectDto {
   @IsOptional()
   name: string;
 
+  @ApiPropertyOptional({ example: 'student@gmail.com', title: 'email', description: 'email' })
+  @IsOptional()
+  description: string;
+
   @ApiPropertyOptional({ example: 'student', title: 'username', description: 'username' })
   @IsOptional()
   is_public: boolean;

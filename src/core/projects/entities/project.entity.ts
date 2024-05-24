@@ -18,6 +18,9 @@ export class Project extends BaseEntity {
   @Column()
   name: string;
 
+  @Column({default: ''})
+  description: string;
+
   @Column('float', { default: 0, nullable: true })
   size: number;
 

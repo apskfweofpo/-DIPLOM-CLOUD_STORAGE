@@ -36,23 +36,7 @@ export class UsersController {
     return this.usersService.findAll(dto);
   }
 
-  @ApiOperation({
-    summary: '[ADMIN]Получить одного пользователя',
-    description: 'Этот запрос используется для получения пользователя',
-  })
-  @ApiResponseWrapper(
-    {
-      options: { status: 200, description: Messages.SUCCESSFUL_OPERATION },
-      withMeta: true,
-    },
-    UserDto,
-  )
-  @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: 'Получить профиль',
     description: 'Этот запрос используется для получения профиля',
@@ -70,6 +54,25 @@ export class UsersController {
     const userId = req.user['sub'];
     return this.usersService.findOne(+userId);
   }
+
+  @ApiOperation({
+    summary: '[ADMIN]Получить одного пользователя',
+    description: 'Этот запрос используется для получения пользователя',
+  })
+  @ApiResponseWrapper(
+    {
+      options: { status: 200, description: Messages.SUCCESSFUL_OPERATION },
+      withMeta: true,
+    },
+    UserDto,
+  )
+  @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
+  }
+
+  
 
   @ApiOperation({
     summary: 'Редактировать профиль',
