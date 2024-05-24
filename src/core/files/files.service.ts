@@ -9,8 +9,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { CreatePackageDto } from './dto/create-package.dto';
 import { Project } from '../projects/entities/project.entity';
+import { Response } from 'express';
 @Injectable()
 export class FilesService {
+ 
   constructor(
     @InjectRepository(Files)
     private repository: Repository<Files>,
@@ -18,6 +20,14 @@ export class FilesService {
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
   ) {}
+
+  async downloadFile(fileId: number, res: Response) {
+
+    const file = await this.repository.findOne({where: {id: fileId}})
+
+    console.log('file.path',file.path)
+    res.download('dist/src/static/' + file.path, file.name)
+  }
 
   getByOptions(where?: FindOptionsWhere<Files>) {
     return this.repository.find({ where, relations: { parent: true, children: true } });

@@ -9,6 +9,7 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
+  Res,
 } from '@nestjs/common';
 import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiErrorWrapper } from 'src/common/decorators/swagger-error.decorator';
@@ -21,6 +22,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { DeleteFilesDto } from './dto/delete-files.dto';
 import { CreatePackageDto } from './dto/create-package.dto';
+import { Response } from 'express';
 
 @ApiTags('Files')
 @Controller('files')
@@ -35,6 +37,17 @@ export class FilesController {
   @Get(':projectId')
   async getAllFiles(@Param('projectId') project_id: number, @Query() dto: GetFileDto) {
     return this.filesService.getByOptions({ project_id, parentId: dto.parentId });
+  }
+
+  @ApiOperation({
+    summary: 'Скачать файл',
+    description: 'Этот запрос используется для скачивания файла',
+  })
+  @ApiErrorWrapper(Exceptions[ExceptionMessages.ERROR_RESPONSE])
+  @Get('download/:fileId')
+  async download(@Param('fileId') fileId: number, @Res() res: Response) {
+     await this.filesService.downloadFile(fileId, res);
+     return;
   }
 
   @ApiOperation({
