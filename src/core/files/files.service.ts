@@ -26,7 +26,7 @@ export class FilesService {
     const file = await this.repository.findOne({where: {id: fileId}})
 
     console.log('file.path',file.path)
-    res.download('dist/src/static/' + file.path, file.name)
+    res.download('dist/src/static/' + file.path, file.name + '.' + file.meme_type)
   }
 
   getByOptions(where?: FindOptionsWhere<Files>) {
