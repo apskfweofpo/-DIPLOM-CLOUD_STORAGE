@@ -12,7 +12,6 @@ import { Project } from '../projects/entities/project.entity';
 import { Response } from 'express';
 @Injectable()
 export class FilesService {
- 
   constructor(
     @InjectRepository(Files)
     private repository: Repository<Files>,
@@ -25,7 +24,6 @@ export class FilesService {
 
     const file = await this.repository.findOne({where: {id: fileId}})
 
-    console.log('file.path',file.path)
     res.download('dist/src/static/' + file.path, file.name + '.' + file.meme_type)
   }
 
@@ -60,7 +58,7 @@ export class FilesService {
       const parent = await this.repository.findOne({
         where: { id: parent_id },
         relations: { parent: true },
-        select: {project_id: true, id: true, size: true, parent: {id: true}}
+        select: { project_id: true, id: true, size: true, parent: { id: true } },
       });
       await this.updateSize(parent, size);
       file.parent = parent;
@@ -72,17 +70,14 @@ export class FilesService {
       relations: { files: true },
     });
 
-    this.projectRepository.update(project.id, {size: project.size + size })
+    this.projectRepository.update(project.id, { size: project.size + size });
     this.repository.save(file);
   }
 
   async updateSize(file: Files, size_change: number) {
     const { size } = file;
-    console.log('file.id',file.id)
     await this.repository.update(file.id, { size: size + size_change });
-    console.log('file.id',file.id)
     if (file.parent) {
-      console.log('file.parent',file.parent)
       const parent = await this.repository.findOne({
         where: { id: file.parent.id },
         relations: { parent: true },
@@ -99,14 +94,12 @@ export class FilesService {
   async writeFile(file: Express.Multer.File) {
     try {
       const names = file.originalname.split('.');
-      console.log('names', names);
       const meme_type = names[names.length - 1];
       const fileName = uuidv4() + '.' + meme_type;
       const filePath = path.resolve(__dirname, '..', '..', 'static');
       if (!fs.existsSync(filePath)) {
         fs.mkdirSync(filePath, { recursive: true });
       }
-      console.log('filePath', filePath);
       fs.writeFileSync(path.join(filePath, fileName), file.buffer);
       return fileName;
     } catch (e) {
@@ -120,7 +113,6 @@ export class FilesService {
   async remove(raw_ids: string) {
     const ids: number[] = raw_ids.split(',').map((id) => Number(id));
 
-    console.log('katysha',ids)
 
     for (const id of ids) {
       const project = await this.projectRepository.findOne({

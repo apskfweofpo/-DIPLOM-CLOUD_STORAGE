@@ -9,6 +9,7 @@ import { ProjectsModule } from './core/projects/projects.module';
 import { FilesModule } from './core/files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import path from 'path';
+import { DownloadLinkModule } from './core/download-links/download-link.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import path from 'path';
     DatabaseModule,
     AuthModule,
     ProjectsModule,
+    DownloadLinkModule,
     FilesModule,
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname, 'static'),

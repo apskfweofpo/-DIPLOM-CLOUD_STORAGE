@@ -1,6 +1,7 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ROLES } from '../constrants/roles.enum';
 import { Project } from 'src/core/projects/entities/project.entity';
+import { Roles } from 'src/core/role.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -30,4 +31,14 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Project, (project) => project.user)
   projects: Project[];
+
+  // @ManyToOne(() => Roles, {
+  //   onUpdate: 'RESTRICT',
+  //   onDelete: 'RESTRICT',
+  // })
+  // @JoinColumn({ name: 'role_id' })
+  // role: Roles;
+
+  // @Column({ type: 'bigint', select: true, nullable: true })
+  // role_id: number;
 }
