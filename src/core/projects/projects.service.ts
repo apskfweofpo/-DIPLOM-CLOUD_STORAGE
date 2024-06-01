@@ -53,7 +53,11 @@ export class ProjectsService {
   }
 
   findOne(id: number) {
-    return this.repository.findOne({ where: { id } });
+    return this.repository.findOne({ where: { id }, relations: {
+      files: {
+        children: true
+      }
+    } });
   }
 
   update(id: number, updateProjectDto: UpdateProjectDto) {

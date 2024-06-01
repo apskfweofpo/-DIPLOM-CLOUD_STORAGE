@@ -37,13 +37,14 @@ export class AuthService {
   async signIn(data: AuthDto) {
     // Check if user exists
     const user = await this.usersService.findByOption({ email: data.email });
+    if (!user) throw new BadRequestException('User does not exist');
+
     if(user.is_ban) {
       throw new LogicException(
         ExceptionMessages.STREET_NOT_EXIST,
         HttpStatus.I_AM_A_TEAPOT,
       );
     }
-    if (!user) throw new BadRequestException('User does not exist');
     const passwordMatches = await argon2.verify(user.password, data.password);
     if (!passwordMatches) throw new BadRequestException('Password is incorrect');
     const tokens = await this.getTokens(user);
@@ -77,7 +78,7 @@ export class AuthService {
         },
         {
           secret: 'secret',
-          expiresIn: '15m',
+          expiresIn: '15d',
         },
       ),
       this.jwtService.signAsync(

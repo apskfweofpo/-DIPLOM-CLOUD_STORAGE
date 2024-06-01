@@ -70,8 +70,8 @@ export class FilesService {
       relations: { files: true },
     });
 
-    this.projectRepository.update(project.id, { size: project.size + size });
-    this.repository.save(file);
+   await this.projectRepository.update(project.id, { size: project.size + size });
+   await this.repository.save(file);
   }
 
   async updateSize(file: Files, size_change: number) {
