@@ -13,4 +13,8 @@ export class UpdateProjectDto {
   @ApiPropertyOptional({ example: 'student', title: 'username', description: 'username' })
   @IsOptional()
   is_public: boolean;
+
+  @ApiPropertyOptional({ example: 'false', title: 'is_pinned', description: 'is_pinned' })
+  @IsOptional()
+  is_pinned: boolean;
 }

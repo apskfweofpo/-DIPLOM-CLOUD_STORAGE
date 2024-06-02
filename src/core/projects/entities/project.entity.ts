@@ -30,6 +30,9 @@ export class Project extends BaseEntity {
   @Column({ default: true })
   is_public: boolean;
 
+  @Column({ default: false, nullable: true })
+  is_pinned: boolean;
+
   @ManyToOne(() => User, {
     onUpdate: 'RESTRICT',
     onDelete: 'RESTRICT',
