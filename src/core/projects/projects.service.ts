@@ -42,6 +42,7 @@ export class ProjectsService {
     if (perPage !== -1) {
       queryBuilder.setFindOptions({ skip: (page - 1) * perPage, take: perPage });
     }
+    queryBuilder.where(`projects.is_public = true`);
 
     const total = await queryBuilder.getCount();
     const nodeMobilityOptions = await queryBuilder.getMany();
@@ -53,11 +54,14 @@ export class ProjectsService {
   }
 
   findOne(id: number) {
-    return this.repository.findOne({ where: { id }, relations: {
-      files: {
-        children: true
-      }
-    } });
+    return this.repository.findOne({
+      where: { id },
+      relations: {
+        files: {
+          children: true,
+        },
+      },
+    });
   }
 
   update(id: number, updateProjectDto: UpdateProjectDto) {

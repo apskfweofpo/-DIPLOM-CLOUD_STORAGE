@@ -76,7 +76,6 @@ export class UsersService {
   }
 
   async deleteIcon(userId: number) {
-    console.log('userId',userId)
     return await this.repository.update(userId, { icon_path: null });
   }
 }

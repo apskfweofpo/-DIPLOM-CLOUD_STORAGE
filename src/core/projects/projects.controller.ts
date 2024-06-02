@@ -48,7 +48,7 @@ export class ProjectsController {
   }
 
   @ApiOperation({
-    summary: '[ADMIN]Получить все проекты',
+    summary: 'Получить все проекты',
     description: 'Этот запрос используется для получения всех проектов',
   })
   @ApiResponseWrapper(
